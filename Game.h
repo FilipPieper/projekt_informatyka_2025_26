@@ -8,6 +8,7 @@
 #include "Brick.h"
 #include "Menu.h"
 #include "GameState.h"
+#include "Scoreboard.h"
 
 using namespace sf;
 
@@ -33,6 +34,9 @@ private:
 
     const int SZEROKOSC_EKRANU = 800;
     const int WYSOKOSC_EKRANU = 600;
+
+    int m_zniszczoneBloki = 0;
+    Clock m_gameClock;
 
 public:
     Game();

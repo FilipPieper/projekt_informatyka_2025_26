@@ -23,7 +23,13 @@ void Game::resetGame()
     // Reset paletki
     m_paletka = Paddle(400, 550, 100, 20, 6);
 
-    // Inicjalizacja bloków
+    // Reset licznika zniszczonych bloków
+    m_zniszczoneBloki = 0;
+
+    // Reset zegara gry
+    m_gameClock.restart();
+
+    // Inicjalizacja bloków TO MA BYÆ W INNEJ KLASIE !!!!!!!
     const int ILOSC_KOLUMN = 8;
     const int ILOSC_WIERSZY = 4;
     float ROZMIAR_BLOKU_X =
@@ -160,6 +166,12 @@ void Game::processEvents()
 
 void Game::update(sf::Time deltaTime)
 {
+    if (m_state == State::MenuState)
+    {
+        m_menu.update();
+        return;
+    }
+
     if (m_state != State::PlayingState)
         return;
 
@@ -170,6 +182,29 @@ void Game::update(sf::Time deltaTime)
         m_paletka.moveRight();
 
     m_paletka.clampToBounds(SZEROKOSC_EKRANU);
+
+
+    // --- SPRAWDZENIE PRZEGRANEJ ---
+    if (m_pilka.getVx() == 0 && m_pilka.getVy() == 0)
+    {
+        std::cout << "Koniec gry! PRZEGRALES ! Ilosc zniszczonych blokow: " << m_zniszczoneBloki << "\n";
+        float czas = m_gameClock.getElapsedTime().asSeconds();
+        // Zapisujemy wynik: ile bloków zniszczono i czas gry
+        Scoreboard::addScore(m_zniszczoneBloki, czas);
+
+        // Powrót do menu
+        m_state = State::MenuState;
+        return;
+    }
+
+    // --- SPRAWDZENIE WYGRANEJ ---
+    if (m_bloki.empty())
+    {
+        std::cout << "Brawo! Plansza wyczyszczona! Tworze nowa... Powodzenia \n";
+
+        // tworzymy nowy poziom
+        resetGame();
+    }
 
     // ruch pi³ki
     m_pilka.move();
@@ -183,10 +218,20 @@ void Game::update(sf::Time deltaTime)
     for (auto& blk : m_bloki) {
         if (!blk.czyZniszczony() &&
             m_pilka.getShape().getGlobalBounds().intersects(blk.getGlobalBounds())) {
+
+            int hpPrzed = blk.getHp();
+
             blk.trafienie();
+
+            // jesli klocek wlasnie zostal zniszczony (hp spadlo do 0)
+            if (hpPrzed > 0 && blk.getHp() == 0) {
+                m_zniszczoneBloki++;
+            }
+
             m_pilka.bounceY();
         }
     }
+
 
     // usuwanie zniszczonych bloków
     m_bloki.erase(
@@ -195,12 +240,8 @@ void Game::update(sf::Time deltaTime)
         m_bloki.end()
     );
 
-    // RESET GRY PO SPACJI
-    if (Keyboard::isKeyPressed(Keyboard::Space)) {
-        if (m_pilka.getVx() == 0 && m_pilka.getVy() == 0) {
-            resetGame();
-        }
-    }
+
+
 }
 
 void Game::render()
@@ -221,14 +262,37 @@ void Game::render()
 
         sf::Text t;
         t.setFont(font);
-        t.setCharacterSize(30);
+        t.setCharacterSize(28);
         t.setFillColor(sf::Color::White);
-        t.setString("Ostatnie wyniki - brak danych\n\nESC aby wrocic");
 
-        sf::FloatRect b = t.getLocalBounds();
-        t.setOrigin(b.width / 2.f, b.height / 2.f);
-        t.setPosition(SZEROKOSC_EKRANU / 2.f, WYSOKOSC_EKRANU / 2.f);
+        // naglowek
+        t.setString("Ostatnie wyniki:");
+        t.setPosition(100.f, 50.f);
+        m_window.draw(t);
 
+        // wczytaj wyniki z pliku
+        auto wyniki = Scoreboard::loadScores();
+
+        float y = 120.f;
+        int nr = 1;
+
+        for (const auto& w : wyniki) {
+            std::string linia =
+                std::to_string(nr) + ". "
+                "Zniszczone bloki: " + std::to_string(w.blocks) +
+                "   Czas: " + std::to_string(static_cast<int>(w.time)) + " s";
+
+            t.setString(linia);
+            t.setPosition(100.f, y);
+            m_window.draw(t);
+
+            y += 40.f;
+            nr++;
+        }
+
+        // informacja o powrocie
+        t.setString("ESC aby wrocic do menu");
+        t.setPosition(100.f, y + 40.f);
         m_window.draw(t);
     }
 

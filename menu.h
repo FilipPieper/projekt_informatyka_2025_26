@@ -11,6 +11,10 @@ private:
     std::vector<sf::Text> menu; // elementy menu
     int selectedItem = 0;
 
+    // Dekoracyjne obracaj¹ce siê kwadraty
+    std::vector<sf::RectangleShape> kwadraty;
+
+
 public:
     Menu(float width, float height);
     
@@ -21,4 +25,8 @@ public:
     int getSelectedItem() const { return selectedItem; }
 
     void draw(sf::RenderWindow& window);
+
+    // animacja
+    void update();
+
 };
