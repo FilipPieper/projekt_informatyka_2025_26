@@ -85,6 +85,8 @@ public:
         target.draw(shape);
     }
 
+    void update(float width, float height, const Paddle& paddle);
+
     float getX() const { return x; }
     float getY() const { return y; }
     float getVx() const { return vx; }

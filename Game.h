@@ -6,6 +6,7 @@
 #include "Ball.h"
 #include "Paddle.h"
 #include "Brick.h"
+#include "Bricks.h"
 #include "Menu.h"
 #include "GameState.h"
 #include "Scoreboard.h"
@@ -27,7 +28,7 @@ private:
 
     Paddle m_paletka;
     Pilka m_pilka;
-    std::vector<Brick> m_bloki;
+    Bricks m_bricks;
 
     Menu m_menu;         
     State m_state;       

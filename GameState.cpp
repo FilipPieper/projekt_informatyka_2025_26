@@ -1,6 +1,6 @@
 #include "GameState.h"
 
-void GameState::capture(const Paddle& paletka, const Pilka& pilka, const std::vector<Brick>& bloki) {
+void GameState::capture(const Paddle& paletka, const Pilka& pilka, const Bricks& bloki) {
 	//Paletka
 	paddlePosition = sf::Vector2f(paletka.getX(), paletka.getY());
 	//Pi³ka
@@ -8,13 +8,13 @@ void GameState::capture(const Paddle& paletka, const Pilka& pilka, const std::ve
 	ballVelocity = sf::Vector2f(pilka.getVx(), pilka.getVy());
 	//Bloki
 	blocks.clear();
-	for (const auto& blok : bloki) {
-		BlockData data;
-		data.x = blok.getPosition().x;
-		data.y = blok.getPosition().y;
-		data.hp = blok.getHp();
-		blocks.push_back(data);
-	}
+    for (const auto& blok : bloki.data()) {
+        BlockData data;
+        data.x = blok.getPosition().x;
+        data.y = blok.getPosition().y;
+        data.hp = blok.getHp();
+        blocks.push_back(data);
+    }
 }
 
 bool GameState::saveToFile(const std::string& filename) {
@@ -43,7 +43,7 @@ bool GameState::saveToFile(const std::string& filename) {
 
 bool GameState::loadFromFile(const std::string& filename,
     Paddle& paletka, Pilka& pilka,
-    std::vector<Brick>& bloki)
+    Bricks& bloki)
 {
     std::ifstream file(filename);
     if (!file.is_open()) return false;
@@ -78,7 +78,8 @@ bool GameState::loadFromFile(const std::string& filename,
     paletka = Paddle(px, py, 100.f, 20.f, 6.f);
     pilka = Pilka(bx, by, vx, vy, 10.f);
 
-    bloki.clear();
+    auto& vec = bloki.data();
+    vec.clear();
 
     const int ILOSC_KOLUMN = 8;
     const float SZEROKOSC_EKRANU = 800.f;
@@ -93,7 +94,7 @@ bool GameState::loadFromFile(const std::string& filename,
             return false;
 
         if (hp > 0) {
-            bloki.emplace_back(
+            vec.emplace_back(
                 sf::Vector2f(x, y),
                 sf::Vector2f(ROZMIAR_BLOKU_X, ROZMIAR_BLOKU_Y),
                 hp
@@ -101,9 +102,9 @@ bool GameState::loadFromFile(const std::string& filename,
         }
     }
 
+
     return true;
+
 }
-
-
 
 

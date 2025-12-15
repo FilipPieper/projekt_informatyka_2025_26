@@ -108,3 +108,4 @@ void Menu::update()
         sq.rotate(1.0f); // 1 stopieñ na klatkê
     }
 }
+

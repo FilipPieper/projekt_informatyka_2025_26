@@ -42,6 +42,8 @@ public:
 			x = width - szerokosc / 2;
 		}
 	}
+	
+	void handleInput(float windowWidth);
 
 	float getX() const { return x; }
 	float getY() const { return y; }

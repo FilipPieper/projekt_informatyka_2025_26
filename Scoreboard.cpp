@@ -42,3 +42,40 @@ void Scoreboard::addScore(int blocks, float time)
         file << s.blocks << " " << s.time << "\n";
     }
 }
+
+void Scoreboard::draw(sf::RenderWindow& window, const sf::Font& font)
+{
+    sf::Text t;
+    t.setFont(font);
+    t.setCharacterSize(28);
+    t.setFillColor(sf::Color::White);
+
+    // naglowek
+    t.setString("Ostatnie wyniki:");
+    t.setPosition(100.f, 50.f);
+    window.draw(t);
+
+    // wyniki
+    auto wyniki = loadScores();
+    float y = 120.f;
+    int nr = 1;
+
+    for (const auto& w : wyniki) {
+        std::string linia =
+            std::to_string(nr) + ". "
+            "Zniszczone bloki: " + std::to_string(w.blocks) +
+            "   Czas: " + std::to_string((int)w.time) + " s";
+
+        t.setString(linia);
+        t.setPosition(100.f, y);
+        window.draw(t);
+
+        y += 40.f;
+        nr++;
+    }
+
+    // stopka
+    t.setString("ESC aby wrocic do menu");
+    t.setPosition(100.f, y + 40.f);
+    window.draw(t);
+}

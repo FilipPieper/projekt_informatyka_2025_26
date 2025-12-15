@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 struct ScoreEntry {
     int blocks;     // ile zniszczonych blokow
@@ -13,4 +14,6 @@ public:
 
     // wczytuje wszystkie wyniki z pliku
     static std::vector<ScoreEntry> loadScores();
+
+    static void draw(sf::RenderWindow& window, const sf::Font& font);
 };
